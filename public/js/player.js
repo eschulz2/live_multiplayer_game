@@ -4,6 +4,22 @@ var Player = function(startX, startY) {
 		id,
 		moveAmount = 2;
 
+	var getX = function() {
+        return x;
+    };
+
+    var getY = function() {
+        return y;
+    };
+
+    var setX = function(newX) {
+        x = newX;
+    };
+
+    var setY = function(newY) {
+        y = newY;
+    };	
+
 	var update = function(keys) {
 
 		var prevX = x,
