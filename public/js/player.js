@@ -1,6 +1,7 @@
 var Player = function(startX, startY) {
 	var x = startX,
 		y = startY,
+		id,
 		moveAmount = 2;
 
 	var update = function(keys) {
@@ -24,6 +25,10 @@ var Player = function(startX, startY) {
 	};
 
 	return {
+		getX: getX,
+        getY: getY,
+        setX: setX,
+        setY: setY,
 		update: update,
 		draw: draw
 	}

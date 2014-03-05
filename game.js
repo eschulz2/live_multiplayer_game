@@ -30,7 +30,21 @@ function onSocketConnection(client) {
 
 function onClientDisconnect() {
     util.log("Player has disconnected: "+this.id);
+
+    var removePlayer = playerById(this.id);
+
+    // if Player not found
+    if (!removePlayer) {
+        util.log("Player not found: "+this.id);
+        return;
+    };
+
+    // This removes the player
+    players.splice(players.indexOf(removePlayer), 1);
+    
+    this.broadcast.emit("remove player", {id: this.id});
 };
+
 
 function onNewPlayer(data) {
 	var newPlayer = new Player(data.x, data.y);
@@ -49,6 +63,17 @@ function onNewPlayer(data) {
 
 function onMovePlayer(data) {
 
+};
+
+// Find player
+function playerById(id) {
+    var i;
+    for (i = 0; i < players.length; i++) {
+        if (players[i].id == id)
+            return players[i];
+    };
+
+    return false;
 };
 
 init();

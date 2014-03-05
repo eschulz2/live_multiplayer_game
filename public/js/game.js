@@ -1,7 +1,9 @@
 var canvas,			// Canvas DOM element
 	ctx,			// Canvas rendering context
 	keys,			// Keyboard input
-	localPlayer;	// Local player
+	localPlayer,	
+	remotePlayers,
+	socket;         // Connects the Socket
 
 function init() {
 	// Declare the canvas and rendering context
@@ -24,6 +26,12 @@ function init() {
 	// Initialise the local player
 	localPlayer = new Player(startX, startY);
 
+    // Socket connection
+	socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
+    
+    // Initialize remotePlayers
+    remotePlayers = [];
+
 	// Start listening for events
 	setEventHandlers();
 };
@@ -35,6 +43,12 @@ var setEventHandlers = function() {
 
 	// Window resize
 	window.addEventListener("resize", onResize, false);
+
+	socket.on("connect", onSocketConnected); // Socket connection
+    socket.on("disconnect", onSocketDisconnect); // Socket disconnect
+    socket.on("new player", onNewPlayer); // New player message received
+    socket.on("move player", onMovePlayer); // Player move message
+    socket.on("remove player", onRemovePlayer); // Player remove message
 };
 
 function onKeydown(e) {
@@ -54,6 +68,41 @@ function onResize(e) {
 	// Maximise the canvas
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
+};
+
+function onSocketConnected() {
+    console.log("Connected to socket server");
+    socket.emit("new player", {x: localPlayer.getX(), y: localPlayer.getY()});
+};
+
+function onSocketDisconnect() {
+    console.log("Disconnected from socket server");
+};
+
+function onNewPlayer(data) {
+    console.log("New player connected: "+data.id);
+
+    var newPlayer = new Player(data.x, data.y); // Initialize new Player
+    newPlayer.id = data.id;
+    
+    remotePlayers.push(newPlayer); // Add the new player
+};
+
+function onMovePlayer(data) {
+
+};
+
+function onRemovePlayer(data) {
+	var removePlayer = playerById(data.id);
+
+    // if player not found
+    if (!removePlayer) {
+        console.log("Player not found: "+data.id);
+        return;
+    };
+
+    remotePlayers.splice(remotePlayers.indexOf(removePlayer), 1);
+
 };
 
 // animation loop
@@ -76,4 +125,21 @@ function draw() {
 
 	// Draw the local player
 	localPlayer.draw(ctx);
+
+	// Draw remotes players
+	var i;
+    for (i = 0; i < remotePlayers.length; i++) {
+        remotePlayers[i].draw(ctx);
+    };
+};
+
+// Search for players
+function playerById(id) {
+    var i;
+    for (i = 0; i < remotePlayers.length; i++) {
+        if (remotePlayers[i].id == id)
+            return remotePlayers[i];
+    };
+
+    return false;
 };
