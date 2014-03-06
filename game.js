@@ -18,7 +18,7 @@ http.createServer(function init(req, res){
 	setEventHandlers();
 
 	res.sendfile(__dirname + 'public/index.html');
-});listen(8000);
+}).listen(8000);
 
 var setEventHandlers = function() {
     socket.sockets.on("connection", onSocketConnection);
