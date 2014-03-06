@@ -5,7 +5,7 @@ var util = require("util"),
 var socket,
     players;
 
-function init(){
+http.createServer(function init(req, res){
 	players = [];
 	socket = io.listen(8000);
 
@@ -15,7 +15,9 @@ function init(){
 
 	});
 	setEventHandlers();
-};
+
+	res.sendfile(__dirname + 'public/index.html');
+});listen(8000);
 
 var setEventHandlers = function() {
     socket.sockets.on("connection", onSocketConnection);
